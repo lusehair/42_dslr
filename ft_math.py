@@ -1,7 +1,7 @@
 from datetime import datetime
 
-def ft_mean(numbers) :
-    return sum(numbers) / float(len(numbers)) 
+# def ft_mean(numbers) :
+#     return sum(numbers) / float(len(numbers)) 
 
 def ft_sample_std_dev(numbers) :
     n = len(numbers)
@@ -20,3 +20,8 @@ def ft_max(x) :
 
 def date_to_age(date) :
     return (datetime.now() - date).days / 365.25 
+
+def unique(x) :
+    return len(list(set(x)))
+
+
