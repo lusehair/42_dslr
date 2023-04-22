@@ -32,8 +32,8 @@ def mean_(df, column):
     column_list = df[column].tolist() 
     mean = 0 
     for i in range(len(column_list)): 
-        mean += column_list[i] 
-    mean = mean / len(column_list) 
+        mean += column_list[i]
+    mean = mean / len(column_list)
     return mean 
 
 def std_dev(df, column): 
@@ -77,6 +77,7 @@ if __name__ == "__main__" :
 
     
     df = pd.read_csv( "dataset_train.csv" ) 
+    df = df.dropna(axis=0, how='any')
     df = df.drop( [ "Hogwarts House" , "First Name" , "Last Name" , "Best Hand" ] , axis = 1 )  
     df['age'] = df['Birthday'].apply(lambda x: calculate_age(datetime.datetime.strptime(x, '%Y-%m-%d')))
     df = df.drop( [ "Birthday" ] , axis = 1 ) 
