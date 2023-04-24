@@ -52,10 +52,13 @@ if __name__ == "__main__" :
 
     houses = [ "Gryffindor" , "Slytherin" , "Ravenclaw" , "Hufflepuff" ] 
     courses = [ "Arithmancy" , "Astronomy" , "Herbology" , "Defense Against the Dark Arts" , "Divination" , "Muggle Studies" , "Ancient Runes" , "History of Magic" , "Transfiguration" , "Potions" , "Care of Magical Creatures" , "Charms" , "Flying" ] 
+    # normalize the data. 
+    for course in courses: 
+        df[course] = z_score(df, course) 
+    # make a histogram for each house by course. 
     for house in houses: 
         data[house] = [] 
         for course in courses: 
-            # print(course, house, mean_(df[df[ "Hogwarts House" ] == house], course))
             data[house].append(mean_(df[df[ "Hogwarts House" ] == house], course)) 
     df = pd.DataFrame(data, index=courses) 
     df.plot.bar() 
