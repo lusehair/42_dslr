@@ -309,15 +309,50 @@ if __name__ == "__main__" :
 
     # Y is the target and the Hogwart House 
     # Is like the range(4) 
-    # y = np.array('Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff')
+    #y = np.array('Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff')
+    Houses = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff'] 
+    y = Houses 
     # y = y.reshape(-1, 1) 
-    # x is the features is Charms, Ancient Runes, Herbology, Astronomy 
+    # x is the features is Charms, Ancient Runes, Herbology, Astronomy  
     x = np.array(df[['Charms', 'Ancient Runes', 'Herbology', 'Astronomy']]) 
+
     nb = 0 
     f1_score = [] 
     f1_val = [] 
+    models = np.genfromtxt("theta.csv", dtype=str, delimiter="\t")
+    theta = []
+    for el in models : 
+        theta.append(np.fromstring(el, sep=","))
+    theta = theta[1:]
 
+    for j in range(6) : 
+        for zipcode in range(4) : 
+            my_lreg = MyLogisticRegression(theta[zipcode + nb].reshape(-1, 1), lambda_=j / 5)  
+        x_pred = np.insert(x, 0, values=1.0, axis=1) 
+        y_hat = np.array([ max((np.dot(i, np.array(theta[zipcode + nb])), zipcode) for zipcode in range(4))[1] for i in x_pred]).reshape(-1, 1) 
+        
+        x_valpred = np.insert(x, 0, values=1.0, axis=1).astype(float) 
+        y_hatval = np.array([ max(( np.dot(i, np.array(theta[zipcode + nb])), zipcode) for zipcode in range(4))[1] for i in x_valpred]).reshape(-1, 1)
+        f1_val.append(f1_score_(y, y_hatval))
+        print("the val is : ", f1_val[j]) 
+        nb+= 4 
+  
+
+    _lambda = f1_val.index(max(f1_val)) / 5 
+    print("the best lambda is : ", _lambda) 
+    theta = [] 
+    for zipcode in range(4) : 
+        my_lreg = MyLogisticRegression(np.ones(x.shape[1] + 1).reshape(-1, 1), lambda_=_lambda) 
+        y_one_loss = np.where(y == zipcode, 1, 0)
+        my_lreg.fit_(x, y_one_loss)   
+        theta.append(my_lreg.theta) 
+    x_pred = np.insert(x, 0, values=1.0, axis=1).astype(float) 
+    y_hat = np.array([ max((np.dot(i, np.array(theta[zipcode])), zipcode) for zipcode in range(4))[1] for i in x_pred]).reshape(-1, 1)
+    x_predtest = np.insert(x, 0, values=1.0, axis=1).astype(float) 
+    y_hattest = np.array([ max((np.dot(i, np.array(theta[zipcode])), zipcode) for zipcode in range(4))[1] for i in x_predtest]).reshape(-1, 1) 
     
+   
+
 
 
 
