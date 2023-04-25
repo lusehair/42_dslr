@@ -300,15 +300,24 @@ def f1_score_(y, y_hat, pos_label=1):
 
 
 if __name__ == "__main__" : 
-    df = pd.read_csv( "dataset_train.csv") 
+    df = pd.read_csv( "dataset_test.csv") 
     df = df.dropna(axis=0, how='any')
     # in df keep only "Charms", "Ancient Runes", "Herbology", "Astronomy", "Hogwarts House", "index" 
     df = df.drop( [ "Arithmancy" , "Defense Against the Dark Arts" , "Divination" , "Muggle Studies" , "History of Magic" , "Transfiguration" , "Potions" , "Care of Magical Creatures" , "Flying" ] , axis = 1 ) 
     df = df.drop( ["First Name" , "Last Name" , "Best Hand", "Birthday"] , axis = 1) 
+    df = df.drop(["Hogwarts House", "index"], axis = 1) 
 
     # Y is the target and the Hogwart House 
-    y = np.array(df["Hogwarts House"])
-    y = y.reshape(-1, 1) 
+    # Is like the range(4) 
+    # y = np.array('Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff')
+    # y = y.reshape(-1, 1) 
     # x is the features is Charms, Ancient Runes, Herbology, Astronomy 
-    x = np.array(df[['Charms', 'Ancient Runes', 'Herbology', 'Astronomy']])
+    x = np.array(df[['Charms', 'Ancient Runes', 'Herbology', 'Astronomy']]) 
+    nb = 0 
+    f1_score = [] 
+    f1_val = [] 
+
+    
+
+
 
