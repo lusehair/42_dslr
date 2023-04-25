@@ -297,20 +297,35 @@ if __name__ == "__main__" :
     df = pd.read_csv( "dataset_train.csv") 
     df = df.dropna(axis=0, how='any')
     # in df keep only "Charms", "Ancient Runes", "Herbology", "Astronomy", "Hogwarts House", "index" 
-    df = df.drop( [ "Arithmancy" , "Astronomy" , "Herbology" , "Defense Against the Dark Arts" , "Divination" , "Muggle Studies" , "Ancient Runes" , "History of Magic" , "Transfiguration" , "Potions" , "Care of Magical Creatures" , "Charms" , "Flying" ] , axis = 1 ) 
+    df = df.drop( [ "Arithmancy" , "Defense Against the Dark Arts" , "Divination" , "Muggle Studies" , "History of Magic" , "Transfiguration" , "Potions" , "Care of Magical Creatures" , "Flying" ] , axis = 1 ) 
     df = df.drop( ["First Name" , "Last Name" , "Best Hand", "Birthday"] , axis = 1) 
 
     # Y is the target and the Hogwart House 
     y = np.array(df["Hogwarts House"])
     y = y.reshape(-1, 1) 
     # x is the features is Charms, Ancient Runes, Herbology, Astronomy 
-    x = np.array(df[['Charms', 'Ancient Runes', 'herbology', 'Astronomy']])
+    x = np.array(df[['Charms', 'Ancient Runes', 'Herbology', 'Astronomy']])
     for i in range(x.shape[1] - 1):
         x[:, [i]] = zscore(x[:, [i]])
     x, x_test, y, y_test = data_spliter(x, y, 0.7)   
     theta_ret = [] 
     theta_p = [] 
-    
+    for j in range(6) : 
+        for zipcode in range(4) : 
+            my_lreg = MyLogisticRegression(np.ones(x.shape[1] + 1).reshape(-1, 1), lambda_=j / 5)
+            y_one_loss = np.where(y == zipcode, 1, 0) 
+            theta = my_lreg.fit_(x, y_one_loss)
+            theta_ret.append(theta) 
+            theta_p.append(theta.T[0]) 
+        x_pred = np.insert(x, 0, values=1.0, axis=1).astype(float)   
+        y_hat = np.array([max((np.dot(i,np.array(theta_ret[house])), house) for house in range(4))[1] for i in x_pred]).reshape(-1, 1)
+        print("lambda is ", j / 5)
+        print(f1_score_(y, y_hat))  
+        x_val = np.insert(x_test, 0, values=1.0, axis=1).astype(float) 
+        y_hat_val = np.array([max((np.dot(i,np.array(theta_ret[house])), house) for house in range(4))[1] for i in x_val]).reshape(-1, 1) 
+        print(f1_score_(y_test, y_hat_val)) 
+    pd.DataFrame(theta_p).to_csv("theta.csv", index=None) 
+
 
 
 
