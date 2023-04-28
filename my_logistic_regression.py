@@ -194,6 +194,8 @@ class MyLogisticRegression():
 			n = x.shape[1]
 
 			step = 0
+			x_step = []
+			loss_time = []
 			while step < self.max_iter:
 				# 1. compute loss J:
 				J = self.gradient(x, y)
@@ -201,7 +203,15 @@ class MyLogisticRegression():
 				self.theta = self.theta - self.alpha * J
 				step += 1
 
-			return self.theta
+				# 3. compute loss for plotting
+				x_step.append(step)
+				h = self.predict_(x)
+				y_hat = h.reshape(-1, 1)
+				loss_time.append(self.loss_(y, y_hat))
+			x_step = np.array(x_step)
+			loss_time = np.array(loss_time)
+
+			return x_step, loss_time
 
 		except Exception as e:
 			print(e)

@@ -170,7 +170,8 @@ if __name__ == "__main__":
 
 		features = labels
 		houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin']
-
+		colors = ['r','y','b','g']
+		
 		# 2. numerize y labels
 		y_train = num_houses(y)
 
@@ -191,14 +192,21 @@ if __name__ == "__main__":
 
 		models = {}
 		y_ = {}
+		fig = plt.figure()
+		fig.suptitle("Loss over time")
 		for i in range(1, 5):
 			# 4.a relabel y labels
 			y_[i] = relabel(y_train, i)
 
 			# 4.b training
 			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=8e-3, max_iter=3000)
-			models[i].fit_(X_tr, y_[i])
+			x_step, loss_time = models[i].fit_(X_tr, y_[i])
 			# print(models[i].theta)
+			plt.plot(x_step, loss_time, label=houses[i-1], linewidth=2, c=colors[i-1])
+		plt.grid()
+		plt.xlabel('Iterations')
+		plt.ylabel('Loss')
+		plt.legend()
 
 		# 5. Predict for each example the class according to each classifiers and select the one with the highest output probability.
 
