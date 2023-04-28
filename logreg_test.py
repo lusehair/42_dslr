@@ -84,7 +84,8 @@ if __name__ == "__main__":
 
 		
 		# 7. Plot scatter plots (one for each pair of features) with the dataset and the final predictions of the model.
-		_, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10))
+		ax, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10), constrained_layout = True)
+
 		cnt = set()
 		k = 0
 		for i in range(len(labels)):
@@ -93,7 +94,7 @@ if __name__ == "__main__":
 					cnt.add((i, j))
 					scatter_plot(fig[k], x_test[:, i], x_test[:, j], y_test.reshape(-1,), y_pred.reshape(-1,), labels[i], labels[j])
 					k += 1
-		fig[k - 1].legend(bbox_to_anchor=(1.04, 1), borderaxespad=0)
+		fig[k - 1].legend(bbox_to_anchor=(1.04, 1), borderaxespad=1)
 		plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
 			+ "Percentage of correct predictions for test data:  " +   str(round(100 * MyLR.score_(y_pred, y_test), 1)) + "%\n" + "labels: " + str(labels))
 		plt.show()

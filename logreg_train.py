@@ -124,7 +124,7 @@ def mean_(x):
 		for i in range(len(column_list)):
 			if str(column_list[i]) != 'nan':
 				m += column_list[i]
-		m = m / len(column_list)
+		m /= len(column_list)
 		return m 
 
 	except Exception as e:
@@ -209,7 +209,8 @@ if __name__ == "__main__":
 		print("fraction of correct predictions for train data:  ", MyLR.score_(y_pred_tr, y_train))
 		
 		# 7. Plot scatter plots (one for each pair of features) with the dataset and the final predictions of the model.
-		_, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10))
+		ax, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10), constrained_layout = True)
+		# ax.tight_layout(pad=2.0)
 		cnt = set()
 		k = 0
 		for i in range(len(labels)):
