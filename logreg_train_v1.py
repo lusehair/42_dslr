@@ -77,9 +77,6 @@ def relabel(y, fav_label):
 		assert isinstance(
 				y, np.ndarray) and (y.ndim == 1 or y.ndim == 2), "1st argument must be a numpy.ndarray, a vector of dimension m * 1"
 		assert isinstance(fav_label, int) and fav_label in {1, 2, 3, 4}, "2nd argument must be a int that is either 0, 1 ,2 or 3"
-		# for yi in y:
-		# 	print(yi)
-		# 	print(type(yi))
 		return(np.array([1 if yi[0]==fav_label else 0 for yi in y])).reshape(-1, 1)
 
 	except Exception as e:
@@ -122,7 +119,7 @@ if __name__ == "__main__":
 
 		# 1. Load data
 		path = "datasets/dataset_train.csv"
-		data_train = pd.read_csv(path)
+		data_train = pd.read_csv(path).dropna()
 		# path = "datasets/dataset_test.csv"
 		# data_test = pd.read_csv(path)
 		# labels = ['Arithmancy','Astronomy','Herbology','Defense Against the Dark Arts','Divination','Muggle Studies','Ancient Runes','History of Magic','Transfiguration','Potions','Care of Magical Creatures','Charms','Flying']
@@ -132,8 +129,8 @@ if __name__ == "__main__":
 		labels.remove('Potions')
 		labels.remove('Care of Magical Creatures')
 		labels.remove('History of Magic')
-		# labels.remove('Transfiguration')
-		# labels.remove('Divination')
+		labels.remove('Transfiguration')
+		labels.remove('Divination')
 		labels.remove('Muggle Studies')
 		labels.remove('Flying')
 		# labels.remove('Astronomy')
@@ -142,26 +139,29 @@ if __name__ == "__main__":
 		# labels.remove('Ancient Runes')
 		# labels.remove('Charms')
 		print(labels)
-		print(len(data_train[labels]))
-		x = data_train[labels].dropna()
-		print(len(x))
+		x = data_train[labels]
 
-		x_train = x.values
+		# fill empty cells with 0
+		# x = fill_zeros(x)
+		x = x.values
 		y = data_train[['Hogwarts House']].values
 		features = labels
 		houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin']
 
 		# 2. numerize y labels
-		y_train = num_houses(y)
+		Y_tr = num_houses(y)
 
-		# 3. Normalization
+		# 3. split data
+		(x_train, x_test, y_train, y_test) = data_splitter(x, Y_tr, 0.99)
+
+		# 4. Normalization
 		# Zscore
 		my_Scaler = Standard_Scaler()
 		my_Scaler.fit(x_train)
 		X_tr = my_Scaler.transform(x_train)
+		X_te = my_Scaler.transform(x_test)
 
-
-		# 4. Training
+		# 5. Training
 		# We are going to train 4 logistic regression classifiers to discriminate each class from the others
 
 		models = {}
@@ -171,11 +171,16 @@ if __name__ == "__main__":
 			y_[i] = relabel(y_train, i)
 
 			# 4.b training
-			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=5e-3, max_iter=400)
+			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=5e-1, max_iter=1000)
 			models[i].fit_(X_tr, y_[i])
-			# print(models[i].theta)
 
 		# 5. Predict for each example the class according to each classifiers and select the one with the highest output probability.
+		y_pred_ = np.array([])
+		for i in range(1, 5):
+			if y_pred_.any():
+				y_pred_ = np.hstack((y_pred_, models[i].predict_(X_te)))
+			else:
+				y_pred_ = models[i].predict_(X_te)
 
 		y_pred_tr_ = np.array([])
 		for i in range(1, 5):
@@ -185,25 +190,19 @@ if __name__ == "__main__":
 				y_pred_tr_ = models[i].predict_(X_tr)
 
 		# 6. Calculate and display the fraction of correct predictions over the total number of predictions based on the test set and compare it to the train set.
-
+		y_pred = np.argmax(y_pred_, axis=1).reshape(-1,1) + 1
+		print("fraction of correct predictions for test data:  ", MyLR.score_(y_pred, y_test))
 		y_pred_tr = np.argmax(y_pred_tr_, axis=1).reshape(-1,1) + 1
-		print("fraction of correct predictions for train data:  ", MyLR.score_(y_pred_tr, y_train))
+		print("fraction of correct predictions for train data:  ", MyLR.score_(y_pred_tr, Y_tr))
 		
 		# 7. Plot 3 scatter plots (one for each pair of citizen features) with the dataset and the final prediction of the model.
-		# _, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10))
-		# print (sum(range(len(labels))))
-		# cnt = set()
-		# k = 0
-		# for i in range(len(labels)):
-		# 	for j in range(len(labels)):
-		# 		if i != j and ((i, j) not in cnt) and i < j:
-		# 			print(k, i, j)
-		# 			cnt.add((i, j))
-		# 			scatter_plot(fig[k], x_train[:, i], x_train[:, j], y_train.reshape(-1,), y_pred_tr.reshape(-1,), labels[i], labels[j])
-		# 			k += 1
-
-		# plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
-		# 	+ "fraction of correct predictions for train data:  " +   str(round(100 * MyLR.score_(y_pred_tr, y_train), 1)))
+		_, fig = plt.subplots(1, 3, figsize=(24, 10))
+		scatter_plot(fig[0], x_test[:, 0], x_test[:, 1], y_test.reshape(-1,), y_pred.reshape(-1,), labels[0], labels[1])
+		scatter_plot(fig[1], x_test[:, 0], x_test[:, 2], y_test.reshape(-1,), y_pred.reshape(-1,), labels[0], labels[2])
+		scatter_plot(fig[2], x_test[:, 2], x_test[:, 1], y_test.reshape(-1,), y_pred.reshape(-1,), labels[2], labels[1])
+		plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
+			+ "fraction of correct predictions for test data:  " +  str(MyLR.score_(y_pred, y_test)) + "\n"\
+			+ "fraction of correct predictions for train data:  " +  str(MyLR.score_(y_pred_tr, y_train)))
 		plt.show()
 
 		# 8. Save models
