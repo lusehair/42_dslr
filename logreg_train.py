@@ -110,20 +110,25 @@ def scatter_plot(fig, x1, x2, y_test, y_pred, xlabel, ylabel):
 		fig.set_xlabel(xlabel)
 		fig.set_ylabel(ylabel)
 		fig.grid()
-		fig.legend()
+		# fig.legend()
 
 	except Exception as e:
 		print(e)
 
 
-def mean_(column): 
-	column_list = column.tolist() 
-	mean = 0 
-	print("here")
-	for i in range(len(column_list)): 
-		mean += column_list[i]
-		mean = mean / len(column_list)
-		return mean 
+def mean_(x):
+	try:
+		assert isinstance(x, pd.Series), "argument must be a panda series or dataframe"
+		column_list = x.tolist() 
+		m = 0 
+		for i in range(len(column_list)):
+			if str(column_list[i]) != 'nan':
+				m += column_list[i]
+		m = m / len(column_list)
+		return m 
+
+	except Exception as e:
+		print(e)
 
 if __name__ == "__main__":
 	try:
@@ -145,25 +150,21 @@ if __name__ == "__main__":
 		labels.remove('Transfiguration')
 		labels.remove('Divination')
 		labels.remove('Muggle Studies')
-		# labels.remove('Flying')
+		labels.remove('Flying')
 		# labels.remove('Astronomy')
 		labels.remove('Defense Against the Dark Arts')
 		# labels.remove('Herbology')
 		# labels.remove('Ancient Runes')
 		# labels.remove('Charms') 
-
+		print(labels)
 		
 		# Replace NaN value by mean 
 		for col in data_train[labels]:
-			mean = mean_(data_train[col])
-			data_train[col].fillna(mean, inplace=True)
+			m = mean_(data_train[col])
+			data_train[col].fillna(m, inplace=True)
 		
-		
-		print(len(data_train[labels]))
-		x = data_train[labels].dropna()
-		
-		print(len(x))
-
+		x = data_train[labels]
+		y = data_train[['Hogwarts House']].values
 		x_train = x.values
 
 		features = labels
@@ -189,7 +190,7 @@ if __name__ == "__main__":
 			y_[i] = relabel(y_train, i)
 
 			# 4.b training
-			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=5e-3, max_iter=4000)
+			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=8e-3, max_iter=3000)
 			models[i].fit_(X_tr, y_[i])
 			# print(models[i].theta)
 
@@ -202,26 +203,24 @@ if __name__ == "__main__":
 			else:
 				y_pred_tr_ = models[i].predict_(X_tr)
 
-		# 6. Calculate and display the fraction of correct predictions over the total number of predictions based on the test set and compare it to the train set.
+		# 6. Calculate and display the fraction of correct predictions over the total number of predictions based on the train set.
 
 		y_pred_tr = np.argmax(y_pred_tr_, axis=1).reshape(-1,1) + 1
 		print("fraction of correct predictions for train data:  ", MyLR.score_(y_pred_tr, y_train))
 		
-		# 7. Plot 3 scatter plots (one for each pair of citizen features) with the dataset and the final prediction of the model.
-		# _, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10))
-		# print (sum(range(len(labels))))
-		# cnt = set()
-		# k = 0
-		# for i in range(len(labels)):
-		# 	for j in range(len(labels)):
-		# 		if i != j and ((i, j) not in cnt) and i < j:
-		# 			print(k, i, j)
-		# 			cnt.add((i, j))
-		# 			scatter_plot(fig[k], x_train[:, i], x_train[:, j], y_train.reshape(-1,), y_pred_tr.reshape(-1,), labels[i], labels[j])
-		# 			k += 1
-
-		# plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
-		# 	+ "fraction of correct predictions for train data:  " +   str(round(100 * MyLR.score_(y_pred_tr, y_train), 1)))
+		# 7. Plot scatter plots (one for each pair of features) with the dataset and the final predictions of the model.
+		_, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10))
+		cnt = set()
+		k = 0
+		for i in range(len(labels)):
+			for j in range(len(labels)):
+				if i != j and ((i, j) not in cnt) and i < j:
+					cnt.add((i, j))
+					scatter_plot(fig[k], x_train[:, i], x_train[:, j], y_train.reshape(-1,), y_pred_tr.reshape(-1,), labels[i], labels[j])
+					k += 1
+		fig[k - 1].legend(bbox_to_anchor=(1.04, 1), borderaxespad=0)
+		plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
+			+ "Percentage of correct predictions for train data:  " +   str(round(100 * MyLR.score_(y_pred_tr, y_train), 1)) + "%\n" + "labels: " + str(labels))
 		plt.show()
 
 		# 8. Save models
