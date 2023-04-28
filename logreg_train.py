@@ -135,19 +135,25 @@ if __name__ == "__main__":
 		# labels.remove('Transfiguration')
 		# labels.remove('Divination')
 		labels.remove('Muggle Studies')
-		labels.remove('Flying')
+		# labels.remove('Flying')
 		# labels.remove('Astronomy')
 		labels.remove('Defense Against the Dark Arts')
 		# labels.remove('Herbology')
 		# labels.remove('Ancient Runes')
 		# labels.remove('Charms')
 		print(labels)
-		print(len(data_train[labels]))
-		x = data_train[labels].dropna()
-		print(len(x))
+
+		x = data_train[labels]
+		y = data_train[['Hogwarts House']]
+
+		tmp = [x, y]
+		x = pd.concat(tmp, axis=1)
+		x = x.dropna()
+		y = x[['Hogwarts House']].values
+		x = x[labels]
 
 		x_train = x.values
-		y = data_train[['Hogwarts House']].values
+
 		features = labels
 		houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin']
 

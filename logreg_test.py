@@ -31,6 +31,12 @@ if __name__ == "__main__":
 
 		labels = ['Herbology', 'Defense Against the Dark Arts', 'Divination', 'Ancient Runes', 'Charms']
 		labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms']
+		labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Charms']
+		labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms']
+		labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Charms', 'Flying']
+		# labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms', 'Flying']
+		labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms', 'Flying']
+		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Charms', 'Flying']
 
 		x_train = data_train[labels]
 		x_train = x_train.dropna()
