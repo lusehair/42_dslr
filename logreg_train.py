@@ -115,6 +115,16 @@ def scatter_plot(fig, x1, x2, y_test, y_pred, xlabel, ylabel):
 	except Exception as e:
 		print(e)
 
+
+def mean_(column): 
+	column_list = column.tolist() 
+	mean = 0 
+	print("here")
+	for i in range(len(column_list)): 
+		mean += column_list[i]
+		mean = mean / len(column_list)
+		return mean 
+
 if __name__ == "__main__":
 	try:
 		# assert len(sys.argv) >= 2, "missing path"
@@ -132,25 +142,27 @@ if __name__ == "__main__":
 		labels.remove('Potions')
 		labels.remove('Care of Magical Creatures')
 		labels.remove('History of Magic')
-		# labels.remove('Transfiguration')
-		# labels.remove('Divination')
+		labels.remove('Transfiguration')
+		labels.remove('Divination')
 		labels.remove('Muggle Studies')
 		# labels.remove('Flying')
 		# labels.remove('Astronomy')
 		labels.remove('Defense Against the Dark Arts')
 		# labels.remove('Herbology')
 		# labels.remove('Ancient Runes')
-		# labels.remove('Charms')
-		print(labels)
+		# labels.remove('Charms') 
 
-		x = data_train[labels]
-		y = data_train[['Hogwarts House']]
-
-		tmp = [x, y]
-		x = pd.concat(tmp, axis=1)
-		x = x.dropna()
-		y = x[['Hogwarts House']].values
-		x = x[labels]
+		
+		# Replace NaN value by mean 
+		for col in data_train[labels]:
+			mean = mean_(data_train[col])
+			data_train[col].fillna(mean, inplace=True)
+		
+		
+		print(len(data_train[labels]))
+		x = data_train[labels].dropna()
+		
+		print(len(x))
 
 		x_train = x.values
 

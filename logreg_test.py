@@ -29,7 +29,7 @@ if __name__ == "__main__":
 		data_testY = pd.read_csv(path)
 		# labels = ['Arithmancy','Astronomy','Herbology','Defense Against the Dark Arts','Divination','Muggle Studies','Ancient Runes','History of Magic','Transfiguration','Potions','Care of Magical Creatures','Charms','Flying']
 
-		labels = ['Herbology', 'Defense Against the Dark Arts', 'Divination', 'Ancient Runes', 'Charms']
+		#labels = ['Herbology', 'Defense Against the Dark Arts', 'Divination', 'Ancient Runes', 'Charms']
 		labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms']
 		labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Charms']
 		labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms']
@@ -90,6 +90,7 @@ if __name__ == "__main__":
 		scatter_plot(fig[2], x_test[:, 2], x_test[:, 1], y_test.reshape(-1,), y_pred.reshape(-1,), labels[2], labels[1])
 		plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
 			+ "Percentage of correct predictions for test data:  " +  str(round(100 * MyLR.score_(y_pred, y_test), 1)) + "%")
+		plt.savefig("pred.png")
 		plt.show()
 
 
