@@ -9,7 +9,7 @@ class MyLogisticRegression():
 	Description:
 	My personnal logistic regression to classify things.
 	"""
-	def __init__(self, theta, alpha=0.001, max_iter=1000, _batch_size=800):
+	def __init__(self, theta, alpha=0.001, max_iter=1000, _batch_size=100):
 		try:
 			assert isinstance(theta, np.ndarray) and theta.ndim == 2 and theta.shape[1] == 1, "1st argument theta must be a numpy.ndarray, a vector of dimension n * 1"
 			assert np.any(theta), "theta cannot be an empty numpy.ndarray"
@@ -206,9 +206,11 @@ class MyLogisticRegression():
 
 			# m = x.shape[0]
 			# n = x.shape[1]
-			#print(x)
+			print(x.shape)
 
 			step = 0
+			x_step = []
+			loss_time = []
 			while step < self.max_iter:
 				# 1. compute loss J:
 				J = self.gradient(x, y)
@@ -216,7 +218,15 @@ class MyLogisticRegression():
 				self.theta = self.theta - self.alpha * J
 				step += 1
 
-			return self.theta
+				# 3. compute loss for plotting
+				x_step.append(step)
+				h = self.predict_(x)
+				y_hat = h.reshape(-1, 1)
+				loss_time.append(self.loss_(y, y_hat))
+			x_step = np.array(x_step)
+			loss_time = np.array(loss_time)
+
+			return x_step, loss_time
 
 		except Exception as e:
 			print(e)

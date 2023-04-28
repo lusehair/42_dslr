@@ -110,7 +110,7 @@ def scatter_plot(fig, x1, x2, y_test, y_pred, xlabel, ylabel):
 		fig.set_xlabel(xlabel)
 		fig.set_ylabel(ylabel)
 		fig.grid()
-		fig.legend()
+		# fig.legend()
 
 	except Exception as e:
 		print(e)
@@ -158,21 +158,23 @@ if __name__ == "__main__":
 			mean = mean_(data_train[col])
 			data_train[col].fillna(mean, inplace=True)
 		
-		
-		print(len(data_train[labels]))
-		x = data_train[labels].dropna()
-		
-		print(len(x))
-
-		x_train = x.values
+		x = data_train[labels]
 		y = data_train[['Hogwarts House']].values
+		x_train = x.values
+
 		features = labels
 		houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin']
+		colors = ['r','y','b','g']
 
 		# 2. numerize y labels
 		y_train = num_houses(y)
 
 		# 3. Normalization
+		# Minmax
+		# my_Scaler = Minmax_Scaler()
+		# my_Scaler.fit(x_train)
+		# X_tr = my_Scaler.transform(x_train)
+
 		# Zscore
 		my_Scaler = Standard_Scaler()
 		my_Scaler.fit(x_train)
@@ -184,14 +186,21 @@ if __name__ == "__main__":
 
 		models = {}
 		y_ = {}
+		fig = plt.figure()
+		fig.suptitle("Loss over time")
 		for i in range(1, 5):
 			# 4.a relabel y labels
 			y_[i] = relabel(y_train, i)
 
 			# 4.b training
-			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=0.005, max_iter=150000, _batch_size=300)
-			models[i].fit_(X_tr, y_[i])
+			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=0.005, max_iter=2000, _batch_size=50)
+			x_step, loss_time = models[i].fit_(X_tr, y_[i])
 			# print(models[i].theta)
+			plt.plot(x_step, loss_time, label=houses[i-1], linewidth=2, c=colors[i-1])
+		plt.grid()
+		plt.xlabel('Iterations')
+		plt.ylabel('Loss')
+		plt.legend()
 
 		# 5. Predict for each example the class according to each classifiers and select the one with the highest output probability.
 
@@ -208,20 +217,19 @@ if __name__ == "__main__":
 		print("fraction of correct predictions for train data:  ", MyLR.score_(y_pred_tr, y_train))
 		
 		# 7. Plot 3 scatter plots (one for each pair of citizen features) with the dataset and the final prediction of the model.
-		# _, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10))
-		# print (sum(range(len(labels))))
+		# ax, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10), constrained_layout = True)
+		# # ax.tight_layout(pad=2.0)
 		# cnt = set()
 		# k = 0
 		# for i in range(len(labels)):
 		# 	for j in range(len(labels)):
 		# 		if i != j and ((i, j) not in cnt) and i < j:
-		# 			print(k, i, j)
 		# 			cnt.add((i, j))
 		# 			scatter_plot(fig[k], x_train[:, i], x_train[:, j], y_train.reshape(-1,), y_pred_tr.reshape(-1,), labels[i], labels[j])
 		# 			k += 1
-
+		# fig[k - 1].legend(bbox_to_anchor=(1.04, 1), borderaxespad=0)
 		# plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
-		# 	+ "fraction of correct predictions for train data:  " +   str(round(100 * MyLR.score_(y_pred_tr, y_train), 1)))
+		# 	+ "Percentage of correct predictions for train data:  " +   str(round(100 * MyLR.score_(y_pred_tr, y_train), 1)) + "%\n" + "labels: " + str(labels))
 		plt.show()
 
 		# 8. Save models
