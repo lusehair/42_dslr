@@ -4,7 +4,7 @@ import pandas as pd
 import sys
 from my_logistic_regression import MyLogisticRegression as MyLR
 from data_splitter import data_splitter
-from scaler import Standard_Scaler
+from scaler import Minmax_Scaler, Standard_Scaler
 import pickle
 
 # print out whole arrays
@@ -63,7 +63,6 @@ def fill_zeros(x):
 		assert isinstance(
 				x, pd.DataFrame), "arguments should be a dataframe"
 		for feature in labels:
-			# x[feature] = x[feature].replace(r'\s+', np.nan, regex=True).fillna(0)
 			x[feature] = x[feature].fillna(0)
 		return x
 
@@ -176,6 +175,11 @@ if __name__ == "__main__":
 		y_train = num_houses(y)
 
 		# 3. Normalization
+		# Minmax
+		# my_Scaler = Minmax_Scaler()
+		# my_Scaler.fit(x_train)
+		# X_tr = my_Scaler.transform(x_train)
+
 		# Zscore
 		my_Scaler = Standard_Scaler()
 		my_Scaler.fit(x_train)
