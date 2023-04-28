@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
 		# 6. Calculate and display the fraction of correct predictions over the total number of predictions based on the test set
 		y_pred = np.argmax(y_pred_, axis=1).reshape(-1,1) + 1
-		print("fraction of correct predictions for test data:  ", MyLR.score_(y_pred, y_test))
+		print("fraction of correct predictions for test data:  ", round(MyLR.score_(y_pred, y_test), 5))
 
 		
 		# 7. Plot scatter plots (one for each pair of features) with the dataset and the final predictions of the model.
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 					k += 1
 		fig[k - 1].legend(bbox_to_anchor=(1.04, 1), borderaxespad=1)
 		plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
-			+ "Percentage of correct predictions for test data:  " +   str(round(100 * MyLR.score_(y_pred, y_test), 1)) + "%\n" + "labels: " + str(labels))
+			+ "Percentage of correct predictions for test data:  " +   str(round(100 * MyLR.score_(y_pred, y_test), 1)) + "%\n" + "Labels:  " + str(labels))
 		plt.show()
 
 

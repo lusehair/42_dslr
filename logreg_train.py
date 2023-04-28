@@ -120,11 +120,13 @@ def mean_(x):
 	try:
 		assert isinstance(x, pd.Series), "argument must be a panda series or dataframe"
 		column_list = x.tolist() 
-		m = 0 
+		m = 0
+		cnt = 0
 		for i in range(len(column_list)):
 			if str(column_list[i]) != 'nan':
 				m += column_list[i]
-		m /= len(column_list)
+				cnt += 1
+		m /= cnt
 		return m 
 
 	except Exception as e:
@@ -206,7 +208,7 @@ if __name__ == "__main__":
 		# 6. Calculate and display the fraction of correct predictions over the total number of predictions based on the train set.
 
 		y_pred_tr = np.argmax(y_pred_tr_, axis=1).reshape(-1,1) + 1
-		print("fraction of correct predictions for train data:  ", MyLR.score_(y_pred_tr, y_train))
+		print("fraction of correct predictions for train data:  ", round(MyLR.score_(y_pred_tr, y_train), 5))
 		
 		# 7. Plot scatter plots (one for each pair of features) with the dataset and the final predictions of the model.
 		ax, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10), constrained_layout = True)
