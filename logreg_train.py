@@ -177,7 +177,7 @@ if __name__ == "__main__":
 			y_[i] = relabel(y_train, i)
 
 			# 4.b training
-			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=5e-3, max_iter=400)
+			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=5e-3, max_iter=4000)
 			models[i].fit_(X_tr, y_[i])
 			# print(models[i].theta)
 
