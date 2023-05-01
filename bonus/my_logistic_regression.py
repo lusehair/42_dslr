@@ -198,7 +198,8 @@ class MyLogisticRegression():
 			step = 0
 			x_step = []
 			loss_time = []
-			while step < self.max_iter:
+			while step < 1:#self.max_iter:
+				print(x.shape, y.shape)
 				# 1. compute loss J:
 				J = self.gradient(x, y)
 
@@ -250,7 +251,8 @@ class MyLogisticRegression():
 				# 1.select random observation datapoint
 				i = rd.randint(0, m - 1)
 				xi = x[i].reshape(1, -1)
-				yi = y[i]
+				yi = y[i].reshape(1, -1)
+				# print(xi.shape, yi.shape)
 
 				# 2. compute loss J:
 				J = self.gradient(xi, yi)
@@ -300,6 +302,7 @@ class MyLogisticRegression():
 			np.random.shuffle(x_shuffle, )
 			np.random.seed(rdi)
 			np.random.shuffle(y_shuffle, )
+			# print(x_shuffle[: batch_size], y_shuffle[: batch_size])
 
 			return x_shuffle[: batch_size], y_shuffle[: batch_size]
 
@@ -336,8 +339,8 @@ class MyLogisticRegression():
 			
 			while step < self.max_iter:
 				# 1.select batch_size random observation datapoints
-				# xi, yi = self.create_batch(x, y, batch_size)
-
+				xi, yi = self.create_batch(x, y, batch_size)
+				# print(xi.shape, yi.shape)
 				# 1 shuffle dataset
 				# x_shuffle = x[:]
 				# y_shuffle = y[:]
@@ -346,11 +349,11 @@ class MyLogisticRegression():
 				# np.random.shuffle(x_shuffle, )
 				# np.random.seed(rdi)
 				# np.random.shuffle(y_shuffle, )
-				x_tmp = np.random.choice(x.shape[0], size=batch_size, replace=False)
-				y_tmp = np.random.choice(y.shape[0], size=batch_size, replace=False)
+				# x_tmp = np.random.choice(x.shape[0], size=batch_size, replace=False)
+				# y_tmp = np.random.choice(y.shape[0], size=batch_size, replace=False)
 
-				xi = x[x_tmp, :]
-				yi = y[y_tmp, :]
+				# xi = x[x_tmp, :]
+				# yi = y[y_tmp, :]
 
 				# loop over dataset with sets of size batch_size
 				# for j in range(0, m, batch_size):
