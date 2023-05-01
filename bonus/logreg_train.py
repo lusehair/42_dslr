@@ -195,7 +195,7 @@ if __name__ == "__main__":
 		models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=6e-3, max_iter=3000)
 		# x_step, loss_time = models[i].fit_(X_tr, y_[i])
 		# x_step, loss_time = models[i].fit_SGD(X_tr, y_[i])
-		x_step, loss_time = models[i].fit_minibatch(X_tr, y_[i], batch_size=1)
+		x_step, loss_time = models[i].fit_minibatch(X_tr, y_[i], batch_size=10)
 		# print(models[i].theta)
 		plt.plot(x_step, loss_time, label=houses[i-1], linewidth=2, c=colors[i-1])
 	time_end = time.time()

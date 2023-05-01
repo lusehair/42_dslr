@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from math import log, exp
 import random as rd
+from copy import deepcopy
 
 class MyLogisticRegression():
 	"""
@@ -295,8 +296,9 @@ class MyLogisticRegression():
 			assert np.any(x) or np.any(y), "arguments cannot be empty numpy.ndarray"
 
 			# shuffle input data
-			x_shuffle = x[:]
-			y_shuffle = y[:]
+			
+			x_shuffle = deepcopy(x[:])
+			y_shuffle = deepcopy(y[:])
 			rdi = rd.randint(0, 100)
 			np.random.seed(rdi)
 			np.random.shuffle(x_shuffle, )
@@ -340,7 +342,7 @@ class MyLogisticRegression():
 			while step < self.max_iter:
 				# 1.select batch_size random observation datapoints
 				xi, yi = self.create_batch(x, y, batch_size)
-				# print(xi.shape, yi.shape)
+				# print(xi, yi)
 				# 1 shuffle dataset
 				# x_shuffle = x[:]
 				# y_shuffle = y[:]
