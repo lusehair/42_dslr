@@ -276,42 +276,6 @@ class MyLogisticRegression():
 			print(e)
 			return None
 
-	def create_batch(self, x, y, batch_size):
-		"""
-		Description:
-		Select a random batch of size batch_size for use in mini batch Gradient Descent.
-		
-		"""
-		try:
-			assert isinstance(
-				x, np.ndarray), "1st argument must be a numpy.ndarray, a vector of dimension m * n"
-			assert isinstance(
-				y, np.ndarray) and (y.ndim == 1 or y.ndim == 2),  "2nd argument must be a numpy.ndarray, a vector of dimension m * 1"
-			assert isinstance(batch_size, int) and batch_size > 0, "3rd argument must be a positive int"
-			if (x.ndim == 1):
-				x = x.reshape(-1, 1)
-			if (y.ndim == 1):
-				y = y.reshape(-1, 1)
-			assert y.shape[0] == x.shape[0], "arrays must be the same size"
-			assert np.any(x) or np.any(y), "arguments cannot be empty numpy.ndarray"
-
-			# shuffle input data
-			
-			x_shuffle = deepcopy(x[:])
-			y_shuffle = deepcopy(y[:])
-			rdi = rd.randint(0, 100)
-			np.random.seed(rdi)
-			np.random.shuffle(x_shuffle, )
-			np.random.seed(rdi)
-			np.random.shuffle(y_shuffle, )
-			# print(x_shuffle[: batch_size], y_shuffle[: batch_size])
-
-			return x_shuffle[: batch_size], y_shuffle[: batch_size]
-
-		except Exception as e:
-			print(e)
-			return None
-
 
 	def fit_minibatch(self, x, y, batch_size):
 		"""
@@ -341,27 +305,14 @@ class MyLogisticRegression():
 			
 			while step < self.max_iter:
 				# 1.select batch_size random observation datapoints
-				xi, yi = self.create_batch(x, y, batch_size)
-				# print(xi, yi)
-				# 1 shuffle dataset
-				# x_shuffle = x[:]
-				# y_shuffle = y[:]
-				# rdi = rd.randint(0, 100)
-				# np.random.seed(rdi)
-				# np.random.shuffle(x_shuffle, )
-				# np.random.seed(rdi)
-				# np.random.shuffle(y_shuffle, )
-				# x_tmp = np.random.choice(x.shape[0], size=batch_size, replace=False)
-				# y_tmp = np.random.choice(y.shape[0], size=batch_size, replace=False)
+				rdi = rd.randint(0, 100)
+				np.random.seed(rdi)
+				x_tmp = np.random.choice(x.shape[0], size=batch_size, replace=False)
+				np.random.seed(rdi)
+				y_tmp = np.random.choice(y.shape[0], size=batch_size, replace=False)
 
-				# xi = x[x_tmp, :]
-				# yi = y[y_tmp, :]
-
-				# loop over dataset with sets of size batch_size
-				# for j in range(0, m, batch_size):
-					# xi = x_shuffle[j: j + batch_size]
-					# yi = y_shuffle[j: j + batch_size]
-					# xi, yi = self.create_batch(x, y, batch_size)
+				xi = x[x_tmp, :]
+				yi = y[y_tmp, :]
 
 				# 2. compute loss J:
 				J = self.gradient(xi, yi)
