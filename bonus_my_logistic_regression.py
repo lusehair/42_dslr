@@ -192,10 +192,18 @@ class MyLogisticRegression():
 			assert np.any(x) or np.any(y), "arguments cannot be empty numpy.ndarray"
 
 			#print(y)
-			x_ = x.copy()
-			y_ = y.copy()
+			x_ = x
+			y_ = y
 	
+			# x_tmp = np.random.choice(x.shape[0], size=self._batch_size, replace=False)
+			# y_tmp = np.random.choice(y.shape[0], size=self._batch_size, replace=False)
+
+			# x = x_[x_tmp, :]
+			# y = y_[y_tmp, :]
+
+
 			
+
 			# m = x.shape[0]
 			# n = x.shape[1]
 			print(x.shape)
@@ -204,11 +212,16 @@ class MyLogisticRegression():
 			x_step = []
 			loss_time = []
 			while step < self.max_iter:
+				x_ = x
+				y_ = y
+		
 				x_tmp = np.random.choice(x.shape[0], size=self._batch_size, replace=False)
 				y_tmp = np.random.choice(y.shape[0], size=self._batch_size, replace=False)
 
 				x = x_[x_tmp, :]
 				y = y_[y_tmp, :]
+				# print(x)
+
 				# 1. compute loss J:
 				J = self.gradient(x, y)
 				# 2. update theta:

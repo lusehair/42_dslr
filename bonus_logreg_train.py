@@ -193,7 +193,9 @@ if __name__ == "__main__":
 			y_[i] = relabel(y_train, i)
 
 			# 4.b training
-			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=0.0001, max_iter=100000, _batch_size=50)
+			# BEST TRAINING : 0.3 alpha, 1000 iterations, 40 batch size 
+
+			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=0.3, max_iter=1000, _batch_size=100)
 			x_step, loss_time = models[i].fit_(X_tr, y_[i])
 			# print(models[i].theta)
 			plt.plot(x_step, loss_time, label=houses[i-1], linewidth=2, c=colors[i-1])
