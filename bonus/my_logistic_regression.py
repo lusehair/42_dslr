@@ -1,15 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from math import log, exp
-import random
-
+import random as rd
 
 class MyLogisticRegression():
 	"""
 	Description:
 	My personnal logistic regression to classify things.
 	"""
-	def __init__(self, theta, alpha=0.001, max_iter=1000, _batch_size=100):
+	def __init__(self, theta, alpha=0.001, max_iter=1000):
 		try:
 			assert isinstance(theta, np.ndarray) and theta.ndim == 2 and theta.shape[1] == 1, "1st argument theta must be a numpy.ndarray, a vector of dimension n * 1"
 			assert np.any(theta), "theta cannot be an empty numpy.ndarray"
@@ -21,7 +20,6 @@ class MyLogisticRegression():
 			self.alpha = alpha
 			self.max_iter = max_iter
 			self.theta = theta
-			self._batch_size = _batch_size
 
 		except Exception as e:
 			print(e)
@@ -136,17 +134,20 @@ class MyLogisticRegression():
 				x, np.ndarray), "1st argument must be a numpy.ndarray, a vector of dimension m * n"
 			assert isinstance(
 				y, np.ndarray) and (y.ndim == 1 or y.ndim == 2),  "2nd argument must be a numpy.ndarray, a vector of dimension m * 1"
-			m = x.shape[0]
-			n = x.shape[1]
+
 			if (x.ndim == 1):
 				x = x.reshape(-1, 1)
 			if (y.ndim == 1):
 				y = y.reshape(-1, 1)
+			m = x.shape[0]
+			n = x.shape[1]
+			# print("x, y, theta: ", x.shape, y.shape, self.theta.shape)
 			assert isinstance(self.theta, np.ndarray) and (self.theta.shape == (n + 1, 1) or self.theta.shape == (
 				n + 1, )), "theta must be a numpy.ndarray, a vector of dimension (n + 1) * 1"
 			assert y.shape[0] == x.shape[0], "arrays must be the same size"
 			if self.theta.shape == (n + 1, ):
 				self.theta = self.theta.reshape(-1, 1)
+
 			m = y.shape[0]
 			h = self.predict_(x)
 			y_hat = h.reshape(-1, 1)
@@ -190,27 +191,17 @@ class MyLogisticRegression():
 				y = y.reshape(-1, 1)
 			assert y.shape[0] == x.shape[0], "arrays must be the same size"
 			assert np.any(x) or np.any(y), "arguments cannot be empty numpy.ndarray"
-
-			#print(y)
-			x_ = x.copy()
-			y_ = y.copy()
-	
 			
-			# m = x.shape[0]
-			# n = x.shape[1]
-			print(x.shape)
+			m = x.shape[0]
+			n = x.shape[1]
 
 			step = 0
 			x_step = []
 			loss_time = []
 			while step < self.max_iter:
-				x_tmp = np.random.choice(x.shape[0], size=self._batch_size, replace=False)
-				y_tmp = np.random.choice(y.shape[0], size=self._batch_size, replace=False)
-
-				x = x_[x_tmp, :]
-				y = y_[y_tmp, :]
 				# 1. compute loss J:
 				J = self.gradient(x, y)
+
 				# 2. update theta:
 				self.theta = self.theta - self.alpha * J
 				step += 1
@@ -228,6 +219,166 @@ class MyLogisticRegression():
 		except Exception as e:
 			print(e)
 			return None
+
+
+	def fit_SGD(self, x, y):
+		"""
+		Description:
+		Fits the model to the training dataset using Stochastic Gradient Descent.
+		
+		"""
+		try:
+			assert isinstance(
+				x, np.ndarray), "1st argument must be a numpy.ndarray, a vector of dimension m * n"
+			assert isinstance(
+				y, np.ndarray) and (y.ndim == 1 or y.ndim == 2),  "2nd argument must be a numpy.ndarray, a vector of dimension m * 1"
+			if (x.ndim == 1):
+				x = x.reshape(-1, 1)
+			if (y.ndim == 1):
+				y = y.reshape(-1, 1)
+			assert y.shape[0] == x.shape[0], "arrays must be the same size"
+			assert np.any(x) or np.any(y), "arguments cannot be empty numpy.ndarray"
+			
+			m = x.shape[0]
+			n = x.shape[1]
+
+			step = 0
+			x_step = []
+			loss_time = []
+			
+			while step < self.max_iter:
+				# 1.select random observation datapoint
+				i = rd.randint(0, m - 1)
+				xi = x[i].reshape(1, -1)
+				yi = y[i]
+
+				# 2. compute loss J:
+				J = self.gradient(xi, yi)
+
+				# 3. update theta:
+				self.theta = self.theta - self.alpha * J
+				step += 1
+
+				# 4. compute loss for plotting
+				x_step.append(step)
+				h = self.predict_(x)
+				y_hat = h.reshape(-1, 1)
+				loss_time.append(self.loss_(y, y_hat))
+			x_step = np.array(x_step)
+			loss_time = np.array(loss_time)
+
+			return x_step, loss_time
+
+		except Exception as e:
+			print(e)
+			return None
+
+	def create_batch(self, x, y, batch_size):
+		"""
+		Description:
+		Select a random batch of size batch_size for use in mini batch Gradient Descent.
+		
+		"""
+		try:
+			assert isinstance(
+				x, np.ndarray), "1st argument must be a numpy.ndarray, a vector of dimension m * n"
+			assert isinstance(
+				y, np.ndarray) and (y.ndim == 1 or y.ndim == 2),  "2nd argument must be a numpy.ndarray, a vector of dimension m * 1"
+			assert isinstance(batch_size, int) and batch_size > 0, "3rd argument must be a positive int"
+			if (x.ndim == 1):
+				x = x.reshape(-1, 1)
+			if (y.ndim == 1):
+				y = y.reshape(-1, 1)
+			assert y.shape[0] == x.shape[0], "arrays must be the same size"
+			assert np.any(x) or np.any(y), "arguments cannot be empty numpy.ndarray"
+
+			# shuffle input data
+			x_shuffle = x[:]
+			y_shuffle = y[:]
+			rdi = rd.randint(0, 100)
+			np.random.seed(rdi)
+			np.random.shuffle(x_shuffle, )
+			np.random.seed(rdi)
+			np.random.shuffle(y_shuffle, )
+
+			return x_shuffle[: batch_size], y_shuffle[: batch_size]
+
+		except Exception as e:
+			print(e)
+			return None
+
+
+	def fit_minibatch(self, x, y, batch_size):
+		"""
+		Description:
+		Fits the model to the training dataset using Stochastic Gradient Descent.
+		
+		"""
+		try:
+			assert isinstance(
+				x, np.ndarray), "1st argument must be a numpy.ndarray, a vector of dimension m * n"
+			assert isinstance(
+				y, np.ndarray) and (y.ndim == 1 or y.ndim == 2),  "2nd argument must be a numpy.ndarray, a vector of dimension m * 1"
+			assert isinstance(batch_size, int) and batch_size > 0, "3rd argument must be a positive int"
+			if (x.ndim == 1):
+				x = x.reshape(-1, 1)
+			if (y.ndim == 1):
+				y = y.reshape(-1, 1)
+			assert y.shape[0] == x.shape[0], "arrays must be the same size"
+			assert np.any(x) or np.any(y), "arguments cannot be empty numpy.ndarray"
+			
+			m = x.shape[0]
+			n = x.shape[1]
+
+			step = 0
+			x_step = []
+			loss_time = []
+			
+			while step < self.max_iter:
+				# 1.select batch_size random observation datapoints
+				# xi, yi = self.create_batch(x, y, batch_size)
+
+				# 1 shuffle dataset
+				# x_shuffle = x[:]
+				# y_shuffle = y[:]
+				# rdi = rd.randint(0, 100)
+				# np.random.seed(rdi)
+				# np.random.shuffle(x_shuffle, )
+				# np.random.seed(rdi)
+				# np.random.shuffle(y_shuffle, )
+				x_tmp = np.random.choice(x.shape[0], size=batch_size, replace=False)
+				y_tmp = np.random.choice(y.shape[0], size=batch_size, replace=False)
+
+				xi = x[x_tmp, :]
+				yi = y[y_tmp, :]
+
+				# loop over dataset with sets of size batch_size
+				# for j in range(0, m, batch_size):
+					# xi = x_shuffle[j: j + batch_size]
+					# yi = y_shuffle[j: j + batch_size]
+					# xi, yi = self.create_batch(x, y, batch_size)
+
+				# 2. compute loss J:
+				J = self.gradient(xi, yi)
+
+				# 3. update theta:
+				self.theta = self.theta - self.alpha * J
+				step += 1
+
+				# 4. compute loss for plotting
+				x_step.append(step)
+				h = self.predict_(x)
+				y_hat = h.reshape(-1, 1)
+				loss_time.append(self.loss_(y, y_hat))
+			x_step = np.array(x_step)
+			loss_time = np.array(loss_time)
+
+			return x_step, loss_time
+
+		except Exception as e:
+			print(e)
+			return None
+
 
 	@staticmethod
 	def score_(y, y_pred):
