@@ -37,13 +37,14 @@ if __name__ == "__main__":
 		# labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms', 'Flying']
 		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms', 'Flying']
 		# labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms', 'Flying']
+		labels = ['Astronomy', 'Herbology', 'Defense Against the Dark Arts', 'Divination', 'Muggle Studies', 'Ancient Runes', 'History of Magic', 'Transfiguration', 'Charms', 'Flying']
 		
 
 		# Replace NaN value by mean
 		mean_train = []
 		for col in data_train[labels]:
-			# m = mean_(data_train[col])
-			m = median_(data_train[col])
+			m = mean_(data_train[col])
+			# m = median_(data_train[col])
 			mean_train.append(m)
 			data_train[col].fillna(m, inplace=True)
 			data_testX[col].fillna(m, inplace=True)
