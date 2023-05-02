@@ -217,14 +217,14 @@ if __name__ == "__main__":
 				beta = 0.9
 				if len(sys.argv) == 3:
 					beta = sys.argv[2]
-					assert beta.isnumeric(), "2nd argument must be a positive number"
+					beta = float(beta)
+					assert beta >= 0 and beta <= 1,  "3rd argument must be a positive number between 0 and 1"
 				models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=6e-3, max_iter=500)
 				x_step, loss_time = models[i].fit_momentum(X_tr, y_[i], beta=beta)
 			elif GD == "sgdmom":
 				beta = 0.9
 				if len(sys.argv) == 3:
 					beta = sys.argv[2]
-					assert beta.isnumeric(), "2nd argument must be a positive number"
 					beta = float(beta)
 					assert beta >= 0 and beta <= 1,  "3rd argument must be a positive number between 0 and 1"
 				models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=6e-3, max_iter=500)
@@ -272,5 +272,7 @@ if __name__ == "__main__":
 		with open("models.pickle","wb") as f:
 			pickle.dump(models, f)
 
+	except ValueError:
+		print("input is not a number")
 	except Exception as e:
 		print(e)

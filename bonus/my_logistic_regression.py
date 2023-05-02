@@ -350,7 +350,7 @@ class MyLogisticRegression():
 				y = y.reshape(-1, 1)
 			assert y.shape[0] == x.shape[0], "arrays must be the same size"
 			assert np.any(x) or np.any(y), "arguments cannot be empty numpy.ndarray"
-			assert isinstance(beta, (int, float)) and beta > 0 and beta < 1, "3rd argument must be a positive number between 0 and 1"
+			assert isinstance(beta, (int, float)) and beta >= 0 and beta <= 1, "3rd argument must be a positive number between 0 and 1"
 
 			m = x.shape[0]
 			n = x.shape[1]
