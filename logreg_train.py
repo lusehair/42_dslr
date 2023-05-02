@@ -150,6 +150,27 @@ def median_(x):
 	except Exception as e:
 		print(e)
 
+def mean_xy(x, y):
+	try:
+		assert isinstance(x, pd.Series), "argument must be a panda series or dataframe"
+		x_ = x.tolist()
+
+		m = {}
+		cnt = {}
+		for h in range(1, 5):
+			m[h] = 0
+			cnt[h] = 0
+		for i in range(len(x_)):
+			if str(x_[i]) != 'nan':
+				m[y[i][0]] += x_[i]
+				cnt[y[i][0]] += 1
+		for h in range(1, 5):
+			m[h] /= cnt[h]
+		return m 
+
+	except Exception as e:
+		print(e)
+
 if __name__ == "__main__":
 	try:
 		# assert len(sys.argv) >= 2, "missing path"
@@ -178,20 +199,28 @@ if __name__ == "__main__":
 		# labels.remove('Charms')
 		print(labels)
 
-		# Replace NaN value by mean
-		mean_train = []
-		cnt = 0
-		for col in data_train[labels]:
-			m = mean_(data_train[col])
-			# m = median_(data_train[col])
-			
-			mean_train.append(m)
-			data_train[col].fillna(m, inplace=True)
-		df_mean = pd.DataFrame(data=np.array(mean_train), columns=['Mean'])
-		df_mean.to_csv('mean_train.csv', index=False)
-
-		x = data_train[labels]
+		# 2. numerize y labels
 		y = data_train[['Hogwarts House']].values
+		y_train = num_houses(y)
+
+		# Replace NaN value by mean
+		# mean_train = []
+		# cnt = 0
+		# for col in data_train[labels]:
+		# 	m = mean_(data_train[col])
+		# 	# m = median_(data_train[col])
+		# 	mean_train.append(m)
+		# 	data_train[col].fillna(m, inplace=True)
+		# df_mean = pd.DataFrame(data=np.array(mean_train), columns=['Mean'])
+		# df_mean.to_csv('mean_train.csv', index=False)
+		x = data_train[labels]
+		m = {}
+		for col in x:
+			m[col] = mean_xy(x[col], y_train)
+		for col in x:
+			for i in range(len(x)):
+				if str(x[col].iloc[i]) == 'nan':
+					x[col].iloc[i] = m[col][y_train[i][0]]
 		x_train = x.values
 		
 		features = labels
