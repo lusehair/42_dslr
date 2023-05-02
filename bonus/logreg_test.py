@@ -34,7 +34,7 @@ if __name__ == "__main__":
 		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms']
 		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Charms', 'Flying']
 		# labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms', 'Flying']
-		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms', 'Flying']
+		labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms', 'Flying']
 		# labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms', 'Flying']
 		
 
@@ -97,6 +97,12 @@ if __name__ == "__main__":
 		plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
 			+ "Percentage of correct predictions for test data:  " +   str(round(100 * MyLR.score_(y_pred, y_test), 1)) + "%\n" + "Labels:  " + str(labels))
 		plt.show()
+
+		# 8. denumerize predictions
+		houses_pred = label_houses(y_pred)
+		df = pd.DataFrame(data=houses_pred, columns=['Hogwarts House'])
+		df.index.name = 'Index'
+		df.to_csv('houses.csv', index=True)
 
 
 	except Exception as e:
