@@ -4,13 +4,15 @@ import pandas as pd
 import sys
 from my_logistic_regression import MyLogisticRegression as MyLR
 from data_splitter import data_splitter
-from scaler import Minmax_Scaler, Standard_Scaler
+from scaler import Standard_Scaler
 import pickle
+from TinyStatistician import TinyStatistician as TS
+from copy import deepcopy
 
 # print out whole arrays
 np.set_printoptions(threshold=np.inf)
 
-# disable false positive warings
+# disable false positive warnings
 pd.options.mode.chained_assignment = None  # default='warn'
 
 
@@ -36,7 +38,6 @@ def num_houses(y):
 		print(e)
 		return None
 
-
 def label_houses(y):
 	try:
 		assert isinstance(
@@ -47,6 +48,8 @@ def label_houses(y):
 		dict_[3] = 'Ravenclaw'
 		dict_[4] = 'Slytherin'
 
+		if y.ndim == 2:
+			y = y.reshape(-1,)
 		y_ = []
 		for i in range(len(y)):
 			assert y[i] in range(1, 5), "house numerized label must be either 1, 2, 3 or 4"
@@ -57,19 +60,18 @@ def label_houses(y):
 		print(e)
 		return None
 
-
 def fill_zeros(x):
 	try:
 		assert isinstance(
 				x, pd.DataFrame), "arguments should be a dataframe"
 		for feature in labels:
+			# x[feature] = x[feature].replace(r'\s+', np.nan, regex=True).fillna(0)
 			x[feature] = x[feature].fillna(0)
 		return x
 
 	except Exception as e:
 		print(e)
 		return None
-
 
 def relabel(y, fav_label):
 	try:
@@ -83,7 +85,6 @@ def relabel(y, fav_label):
 
 	except Exception as e:
 		print(e)
-	
 
 def scatter_plot(fig, x1, x2, y_test, y_pred, xlabel, ylabel):
 	try:
@@ -114,7 +115,6 @@ def scatter_plot(fig, x1, x2, y_test, y_pred, xlabel, ylabel):
 	except Exception as e:
 		print(e)
 
-
 def mean_(x):
 	try:
 		assert isinstance(x, pd.Series), "argument must be a panda series or dataframe"
@@ -131,7 +131,6 @@ def mean_(x):
 	except Exception as e:
 		print(e)
 
-
 def median_(x):
 	try:
 		assert isinstance(x, pd.Series), "argument must be a panda series or dataframe"
@@ -146,6 +145,7 @@ def median_(x):
 			return float(column_list[int(n / 2)])
 		else:
 			return float((column_list[int(n / 2) - 1] + column_list[int(n / 2)]) / 2)
+
 
 	except Exception as e:
 		print(e)
@@ -175,22 +175,28 @@ if __name__ == "__main__":
 		labels.remove('Defense Against the Dark Arts')
 		# labels.remove('Herbology')
 		# labels.remove('Ancient Runes')
-		# labels.remove('Charms') 
+		# labels.remove('Charms')
 		print(labels)
-		
-		# Replace NaN value by mean 
+
+		# Replace NaN value by mean
+		mean_train = []
+		cnt = 0
 		for col in data_train[labels]:
 			m = mean_(data_train[col])
+			# m = median_(data_train[col])
+			
+			mean_train.append(m)
 			data_train[col].fillna(m, inplace=True)
-		
+		df_mean = pd.DataFrame(data=np.array(mean_train), columns=['Mean'])
+		df_mean.to_csv('mean_train.csv', index=False)
+
 		x = data_train[labels]
 		y = data_train[['Hogwarts House']].values
 		x_train = x.values
-
+		
 		features = labels
 		houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin']
 		colors = ['r','y','b','g']
-		
 		# 2. numerize y labels
 		y_train = num_houses(y)
 
@@ -208,17 +214,17 @@ if __name__ == "__main__":
 
 		# 4. Training
 		# We are going to train 4 logistic regression classifiers to discriminate each class from the others
-
 		models = {}
 		y_ = {}
 		fig = plt.figure()
 		fig.suptitle("Loss over time")
+		# ax = plt.axes()
 		for i in range(1, 5):
 			# 4.a relabel y labels
 			y_[i] = relabel(y_train, i)
 
 			# 4.b training
-			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=8e-3, max_iter=3000)
+			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=2e-3, max_iter=6000)
 			x_step, loss_time = models[i].fit_(X_tr, y_[i])
 			# print(models[i].theta)
 			plt.plot(x_step, loss_time, label=houses[i-1], linewidth=2, c=colors[i-1])
@@ -226,7 +232,6 @@ if __name__ == "__main__":
 		plt.xlabel('Iterations')
 		plt.ylabel('Loss')
 		plt.legend()
-
 		# 5. Predict for each example the class according to each classifiers and select the one with the highest output probability.
 
 		y_pred_tr_ = np.array([])
@@ -236,14 +241,13 @@ if __name__ == "__main__":
 			else:
 				y_pred_tr_ = models[i].predict_(X_tr)
 
-		# 6. Calculate and display the fraction of correct predictions over the total number of predictions based on the train set.
+		# 6. Calculate and display the fraction of correct predictions over the total number of predictions based on the test set and compare it to the train set.
 
 		y_pred_tr = np.argmax(y_pred_tr_, axis=1).reshape(-1,1) + 1
-		print("fraction of correct predictions for train data:  ", round(MyLR.score_(y_pred_tr, y_train), 5))
+		print("fraction of correct predictions for train data:  ", MyLR.score_(y_pred_tr, y_train))
 		
-		# 7. Plot scatter plots (one for each pair of features) with the dataset and the final predictions of the model.
+		# 7. Plot 3 scatter plots (one for each pair of citizen features) with the dataset and the final prediction of the model.
 		ax, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10), constrained_layout = True)
-		# ax.tight_layout(pad=2.0)
 		cnt = set()
 		k = 0
 		for i in range(len(labels)):
