@@ -5,7 +5,7 @@ import sys
 from my_logistic_regression import MyLogisticRegression as MyLR
 from data_splitter import data_splitter
 from scaler import Standard_Scaler
-from logreg_train import num_houses, label_houses, fill_zeros, relabel, scatter_plot
+from logreg_train import num_houses, label_houses, fill_zeros, relabel, scatter_plot, mean_, median_
 import pickle
 
 
@@ -38,18 +38,21 @@ if __name__ == "__main__":
 		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms', 'Flying']
 		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Charms', 'Flying']
 
-		x_train = data_train[labels]
-		x_train = x_train.dropna()
-		x_train = x_train.values
+		# Replace NaN value by mean
+		mean_train = []
+		for col in data_train[labels]:
+			m = mean_(data_train[col])
+			# m = median_(data_train[col])
+			mean_train.append(m)
+			data_train[col].fillna(m, inplace=True)
+			data_testX[col].fillna(m, inplace=True)
+		
+		x = data_train[labels]
+		x_train = x.values
 
 		x = data_testX[labels]
-		y = data_testY[['Hogwarts House']]
-		tmp = [x, y]
-		x = pd.concat(tmp, axis=1)
+		y = data_testY[['Hogwarts House']].values
 
-		x = x.dropna()
-		y = x[['Hogwarts House']].values
-		x = x[labels]
 		x_test = x.values
 
 		features = labels

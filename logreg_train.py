@@ -131,6 +131,25 @@ def mean_(x):
 	except Exception as e:
 		print(e)
 
+
+def median_(x):
+	try:
+		assert isinstance(x, pd.Series), "argument must be a panda series or dataframe"
+		x_ = pd.Series(deepcopy(x.to_dict()))
+		x_.dropna()
+		column_list = x_.tolist() 
+		m = 0
+		cnt = 0
+		n = len(column_list)
+		column_list.sort()
+		if (n % 2 == 1):
+			return float(column_list[int(n / 2)])
+		else:
+			return float((column_list[int(n / 2) - 1] + column_list[int(n / 2)]) / 2)
+
+	except Exception as e:
+		print(e)
+
 if __name__ == "__main__":
 	try:
 		# assert len(sys.argv) >= 2, "missing path"
