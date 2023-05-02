@@ -303,10 +303,10 @@ class MyLogisticRegression():
 			
 			while step < self.max_iter:
 				# 1.select batch_size random observation datapoints
-				id = np.random.choice(x.shape[0], size=batch_size, replace=False)
-				xi = x[id, :]
-				yi = y[id, :]
-				
+				rdi = np.random.choice(x.shape[0], size=batch_size, replace=False)
+				xi = x[rdi, :]
+				yi = y[rdi, :]
+
 				# 2. compute loss J:
 				J = self.gradient(xi, yi)
 
@@ -329,26 +329,15 @@ class MyLogisticRegression():
 			return None
 
 
-
 	def fit_momentum(self, x, y, beta=0.9):
 		"""
 		Description:
-		Fits the model to the training dataset contained in x and y.
-		Args:
-		x: has to be a numpy.array, a matrix of dimension m * n:
-		(number of training examples, number of features).
-		y: has to be a numpy.array, a vector of dimension m * 1:
-		(number of training examples, 1).
-		theta: has to be a numpy.array, a vector of dimension (n + 1) * 1:
-		(number of features + 1, 1).
-		alpha: has to be a float, the learning rate
-		max_iter: has to be an int, the number of iterations done during the gradient descent
-		Return:
-		new_theta: numpy.array, a vector of dimension (number of features + 1, 1).
-		None if there is a matching dimension problem.
-		None if x, y, theta, alpha or max_iter is not of expected type.
-		Raises:
-		This function should not raise any Exception.
+		A problem with gradient descent is that it can bounce around the search space on optimization problems that have large amounts of curvature or noisy gradients, and it can get stuck in flat spots in the search space that have no gradient.
+
+		Momentum is an extension to the gradient descent optimization algorithm that allows the search to build inertia in a direction in the search space and overcome the oscillations of noisy gradients and coast across flat spots of the search space.
+		It adds history to the parameter update equation based on the gradient encountered in the previous updates.
+
+		Momentum involves adding an additional hyperparameter that controls the amount of history (momentum) to include in the update equation, i.e. the step to a new point in the search space.
 		"""
 		try:
 			assert isinstance(
@@ -361,7 +350,7 @@ class MyLogisticRegression():
 				y = y.reshape(-1, 1)
 			assert y.shape[0] == x.shape[0], "arrays must be the same size"
 			assert np.any(x) or np.any(y), "arguments cannot be empty numpy.ndarray"
-			assert isinstance(beta, (int, float)) and beta > 0, "3rd argument must be a positive number"
+			assert isinstance(beta, (int, float)) and beta > 0 and beta < 1, "3rd argument must be a positive number between 0 and 1"
 
 			m = x.shape[0]
 			n = x.shape[1]
@@ -369,14 +358,18 @@ class MyLogisticRegression():
 			step = 0
 			x_step = []
 			loss_time = []
+			change_1 = np.array([[0] * (n + 1)]).reshape(-1, 1)
 			while step < self.max_iter:
-				print(x.shape, y.shape)
 				# 1. compute loss J:
 				J = self.gradient(x, y)
 
+				# 2. compute momentum change
+				change = self.alpha * J + beta * change_1
+
 				# 2. update theta:
-				self.theta = self.theta - self.alpha * J
+				self.theta = self.theta - change
 				step += 1
+				change_1 = change
 
 				# 3. compute loss for plotting
 				x_step.append(step)
