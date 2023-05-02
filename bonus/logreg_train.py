@@ -125,120 +125,152 @@ def mean_(x):
 		print(e)
 
 if __name__ == "__main__":
-	# try:
-	# assert len(sys.argv) >= 2, "missing path"
-	# path = sys.argv[1]
+	try:
+		if len(sys.argv) == 1:
+			GD = "batch"
+		else:
+			GD = sys.argv[1]
+		assert GD in {"batch", "sgd", "minibatch", "momentum", "sgdmom"}, "wrong argument, allowed keywords are:\n\
+		\"batch\": basic gradient descent algorithm\n\
+		\"sgd\": stochastic gradient descent algorithm\n\
+		\"minibatch\": minibatch gradient descent algorithm\n\
+		\"momentum\":  basic gradient descent algorithm with momentum\n\
+		\"sgdmom\": stochastic gradient descent algorithm with momentum\n\
+		"
 
-	# 1. Load data
-	path = "../datasets/dataset_train.csv"
-	data_train = pd.read_csv(path)
-	# path = "datasets/dataset_test.csv"
-	# data_test = pd.read_csv(path)
-	# labels = ['Arithmancy','Astronomy','Herbology','Defense Against the Dark Arts','Divination','Muggle Studies','Ancient Runes','History of Magic','Transfiguration','Potions','Care of Magical Creatures','Charms','Flying']
-	labels = list(data_train.select_dtypes(include=['int64', 'float64']).columns)
-	labels.remove('Index')
-	labels.remove('Arithmancy')
-	labels.remove('Potions')
-	labels.remove('Care of Magical Creatures')
-	labels.remove('History of Magic')
-	labels.remove('Transfiguration')
-	labels.remove('Divination')
-	labels.remove('Muggle Studies')
-	labels.remove('Flying')
-	# labels.remove('Astronomy')
-	labels.remove('Defense Against the Dark Arts')
-	# labels.remove('Herbology')
-	# labels.remove('Ancient Runes')
-	# labels.remove('Charms')
-	print(labels)
+		# 1. Load data
+		path = "../datasets/dataset_train.csv"
+		data_train = pd.read_csv(path)
+		# path = "datasets/dataset_test.csv"
+		# data_test = pd.read_csv(path)
+		# labels = ['Arithmancy','Astronomy','Herbology','Defense Against the Dark Arts','Divination','Muggle Studies','Ancient Runes','History of Magic','Transfiguration','Potions','Care of Magical Creatures','Charms','Flying']
+		labels = list(data_train.select_dtypes(include=['int64', 'float64']).columns)
+		labels.remove('Index')
+		labels.remove('Arithmancy')
+		labels.remove('Potions')
+		labels.remove('Care of Magical Creatures')
+		labels.remove('History of Magic')
+		labels.remove('Transfiguration')
+		labels.remove('Divination')
+		labels.remove('Muggle Studies')
+		labels.remove('Flying')
+		# labels.remove('Astronomy')
+		labels.remove('Defense Against the Dark Arts')
+		# labels.remove('Herbology')
+		# labels.remove('Ancient Runes')
+		# labels.remove('Charms')
+		print(labels)
 
-	# Replace NaN value by mean 
-	for col in data_train[labels]:
-		m = mean_(data_train[col])
-		data_train[col].fillna(m, inplace=True)
-	
-	x = data_train[labels]
-	y = data_train[['Hogwarts House']].values
-	x_train = x.values
-	
-	features = labels
-	houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin']
-	colors = ['r','y','b','g']
-	# 2. numerize y labels
-	y_train = num_houses(y)
+		# Replace NaN value by mean 
+		for col in data_train[labels]:
+			m = mean_(data_train[col])
+			data_train[col].fillna(m, inplace=True)
+		
+		x = data_train[labels]
+		y = data_train[['Hogwarts House']].values
+		x_train = x.values
+		
+		features = labels
+		houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin']
+		colors = ['r','y','b','g']
+		# 2. numerize y labels
+		y_train = num_houses(y)
 
-	# 3. Normalization
-	# Minmax
-	# my_Scaler = Minmax_Scaler()
-	# my_Scaler.fit(x_train)
-	# X_tr = my_Scaler.transform(x_train)
+		# 3. Normalization
+		# Minmax
+		# my_Scaler = Minmax_Scaler()
+		# my_Scaler.fit(x_train)
+		# X_tr = my_Scaler.transform(x_train)
 
-	# Zscore
-	my_Scaler = Standard_Scaler()
-	my_Scaler.fit(x_train)
-	X_tr = my_Scaler.transform(x_train)
+		# Zscore
+		my_Scaler = Standard_Scaler()
+		my_Scaler.fit(x_train)
+		X_tr = my_Scaler.transform(x_train)
 
 
-	# 4. Training
-	# We are going to train 4 logistic regression classifiers to discriminate each class from the others
-	time_init = time.time()
-	models = {}
-	y_ = {}
-	fig = plt.figure()
-	
-	# ax = plt.axes()
-	for i in range(1, 5):
-		# 4.a relabel y labels
-		y_[i] = relabel(y_train, i)
+		# 4. Training
+		# We are going to train 4 logistic regression classifiers to discriminate each class from the others
+		time_init = time.time()
+		models = {}
+		y_ = {}
+		fig = plt.figure()
+		
+		# ax = plt.axes()
+		for i in range(1, 5):
+			# 4.a relabel y labels
+			y_[i] = relabel(y_train, i)
 
-		# 4.b training
-		models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=6e-3, max_iter=500)
-		# x_step, loss_time = models[i].fit_(X_tr, y_[i])
-		# x_step, loss_time = models[i].fit_SGD(X_tr, y_[i])
-		# x_step, loss_time = models[i].fit_minibatch(X_tr, y_[i], batch_size=10)
-		x_step, loss_time = models[i].fit_momentum(X_tr, y_[i], beta=0.9)
-		# print(models[i].theta)
-		plt.plot(x_step, loss_time, label=houses[i-1], linewidth=2, c=colors[i-1])
-	time_end = time.time()
-	print("execution time: ", round(time_end - time_init, 2))
-	fig.suptitle("Loss over time\n" + "Execution time: " + str(round(time_end - time_init, 2)) + "s")
-	plt.grid()
-	plt.xlabel('Iterations')
-	plt.ylabel('Loss')
-	plt.legend()
+			# 4.b training
+			models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=6e-3, max_iter=3000)
+			if GD == "batch":
+				x_step, loss_time = models[i].fit_(X_tr, y_[i])
+			elif GD == "sgd":
+				x_step, loss_time = models[i].fit_SGD(X_tr, y_[i])
+			elif GD == "minibatch":
+				bs = 10
+				if len(sys.argv) == 3:
+					bs = sys.argv[2]
+					assert bs.isdigit(), "2nd argument must be a positive integer"
+					bs = int(bs)
+				x_step, loss_time = models[i].fit_minibatch(X_tr, y_[i], batch_size=bs)
+			elif GD == "momentum":
+				beta = 0.9
+				if len(sys.argv) == 3:
+					beta = sys.argv[2]
+					assert beta.isnumeric(), "2nd argument must be a positive number"
+				models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=6e-3, max_iter=500)
+				x_step, loss_time = models[i].fit_momentum(X_tr, y_[i], beta=beta)
+			elif GD == "sgdmom":
+				beta = 0.9
+				if len(sys.argv) == 3:
+					beta = sys.argv[2]
+					assert beta.isnumeric(), "2nd argument must be a positive number"
+					beta = float(beta)
+					assert beta >= 0 and beta <= 1,  "3rd argument must be a positive number between 0 and 1"
+				models[i] = MyLR(np.ones((X_tr.shape[1] + 1, 1)), alpha=6e-3, max_iter=500)
+				x_step, loss_time = models[i].fit_SGD_momentum(X_tr, y_[i], beta=beta)
+			# print(models[i].theta)
+			plt.plot(x_step, loss_time, label=houses[i-1], linewidth=2, c=colors[i-1])
+		time_end = time.time()
+		print("execution time: ", round(time_end - time_init, 2))
+		fig.suptitle("Loss over time\n" + "Execution time: " + str(round(time_end - time_init, 2)) + "s")
+		plt.grid()
+		plt.xlabel('Iterations')
+		plt.ylabel('Loss')
+		plt.legend()
 
-	# 5. Predict for each example the class according to each classifiers and select the one with the highest output probability.
+		# 5. Predict for each example the class according to each classifiers and select the one with the highest output probability.
 
-	# y_pred_tr_ = np.array([])
-	# for i in range(1, 5):
-	# 	if y_pred_tr_.any():
-	# 		y_pred_tr_ = np.hstack((y_pred_tr_, models[i].predict_(X_tr)))
-	# 	else:
-	# 		y_pred_tr_ = models[i].predict_(X_tr)
+		y_pred_tr_ = np.array([])
+		for i in range(1, 5):
+			if y_pred_tr_.any():
+				y_pred_tr_ = np.hstack((y_pred_tr_, models[i].predict_(X_tr)))
+			else:
+				y_pred_tr_ = models[i].predict_(X_tr)
 
-	# # 6. Calculate and display the fraction of correct predictions over the total number of predictions based on the test set and compare it to the train set.
+		# # 6. Calculate and display the fraction of correct predictions over the total number of predictions based on the test set and compare it to the train set.
 
-	# y_pred_tr = np.argmax(y_pred_tr_, axis=1).reshape(-1,1) + 1
-	# print("fraction of correct predictions for train data:  ", MyLR.score_(y_pred_tr, y_train))
-	
-	# # 7. Plot 3 scatter plots (one for each pair of citizen features) with the dataset and the final prediction of the model.
-	# ax, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10), constrained_layout = True)
-	# cnt = set()
-	# k = 0
-	# for i in range(len(labels)):
-	# 	for j in range(len(labels)):
-	# 		if i != j and ((i, j) not in cnt) and i < j:
-	# 			cnt.add((i, j))
-	# 			scatter_plot(fig[k], x_train[:, i], x_train[:, j], y_train.reshape(-1,), y_pred_tr.reshape(-1,), labels[i], labels[j])
-	# 			k += 1
-	# fig[k - 1].legend(bbox_to_anchor=(1.04, 1), borderaxespad=0)
-	# plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
-	# 	+ "Percentage of correct predictions for train data:  " +   str(round(100 * MyLR.score_(y_pred_tr, y_train), 1)) + "%\n" + "labels: " + str(labels))
-	plt.show()
+		y_pred_tr = np.argmax(y_pred_tr_, axis=1).reshape(-1,1) + 1
+		print("fraction of correct predictions for train data:  ", MyLR.score_(y_pred_tr, y_train))
+		
+		# # 7. Plot 3 scatter plots (one for each pair of citizen features) with the dataset and the final prediction of the model.
+		ax, fig = plt.subplots(1, sum(range(len(labels))), figsize=(30, 10), constrained_layout = True)
+		cnt = set()
+		k = 0
+		for i in range(len(labels)):
+			for j in range(len(labels)):
+				if i != j and ((i, j) not in cnt) and i < j:
+					cnt.add((i, j))
+					scatter_plot(fig[k], x_train[:, i], x_train[:, j], y_train.reshape(-1,), y_pred_tr.reshape(-1,), labels[i], labels[j])
+					k += 1
+		fig[k - 1].legend(bbox_to_anchor=(1.04, 1), borderaxespad=0)
+		plt.suptitle("Scatter plots with the dataset and the final prediction of the model\n" \
+			+ "Percentage of correct predictions for train data:  " +   str(round(100 * MyLR.score_(y_pred_tr, y_train), 1)) + "%\n" + "labels: " + str(labels))
+		plt.show()
 
-	# 8. Save models
-	with open("models.pickle","wb") as f:
-		pickle.dump(models, f)
+		# 8. Save models
+		with open("models.pickle","wb") as f:
+			pickle.dump(models, f)
 
-	# except Exception as e:
-	# 	print(e)
+	except Exception as e:
+		print(e)

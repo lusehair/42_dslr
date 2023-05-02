@@ -366,12 +366,71 @@ class MyLogisticRegression():
 				# 2. compute momentum change
 				change = self.alpha * J + beta * change_1
 
-				# 2. update theta:
+				# 3. update theta:
 				self.theta = self.theta - change
 				step += 1
 				change_1 = change
 
-				# 3. compute loss for plotting
+				# 4. compute loss for plotting
+				x_step.append(step)
+				h = self.predict_(x)
+				y_hat = h.reshape(-1, 1)
+				loss_time.append(self.loss_(y, y_hat))
+			x_step = np.array(x_step)
+			loss_time = np.array(loss_time)
+
+			return x_step, loss_time
+
+		except Exception as e:
+			print(e)
+			return None
+
+
+	def fit_SGD_momentum(self, x, y, beta=0.9):
+		"""
+		Description:
+		Fits the model to the training dataset using Stochastic Gradient Descent with momentum.
+		
+		"""
+		try:
+			assert isinstance(
+				x, np.ndarray), "1st argument must be a numpy.ndarray, a vector of dimension m * n"
+			assert isinstance(
+				y, np.ndarray) and (y.ndim == 1 or y.ndim == 2),  "2nd argument must be a numpy.ndarray, a vector of dimension m * 1"
+			if (x.ndim == 1):
+				x = x.reshape(-1, 1)
+			if (y.ndim == 1):
+				y = y.reshape(-1, 1)
+			assert y.shape[0] == x.shape[0], "arrays must be the same size"
+			assert np.any(x) or np.any(y), "arguments cannot be empty numpy.ndarray"
+			assert isinstance(beta, (int, float)) and beta >= 0 and beta <= 1, "3rd argument must be a positive number between 0 and 1"
+
+			m = x.shape[0]
+			n = x.shape[1]
+
+			step = 0
+			x_step = []
+			loss_time = []
+			change_1 = np.array([[0] * (n + 1)]).reshape(-1, 1)
+
+			while step < self.max_iter:
+				# 1.select random observation datapoint
+				i = rd.randint(0, m - 1)
+				xi = x[i].reshape(1, -1)
+				yi = y[i].reshape(1, -1)
+
+				# 2. compute loss J:
+				J = self.gradient(xi, yi)
+
+				# 3. compute momentum change
+				change = self.alpha * J + beta * change_1
+
+				# 4. update theta:
+				self.theta = self.theta - change
+				step += 1
+				change_1 = change
+
+				# 5. compute loss for plotting
 				x_step.append(step)
 				h = self.predict_(x)
 				y_hat = h.reshape(-1, 1)
