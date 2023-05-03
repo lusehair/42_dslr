@@ -34,7 +34,7 @@ if __name__ == "__main__":
 		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms']
 		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Charms', 'Flying']
 		# labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms', 'Flying']
-		labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms', 'Flying']
+		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms', 'Flying']
 		# labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms', 'Flying']
 		
 

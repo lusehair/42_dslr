@@ -37,7 +37,7 @@ if __name__ == "__main__":
 		# labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms', 'Flying']
 		# labels = ['Astronomy', 'Herbology', 'Divination', 'Ancient Runes', 'Transfiguration', 'Charms', 'Flying']
 		# labels = ['Astronomy', 'Herbology', 'Ancient Runes', 'Charms', 'Flying']
-		labels = ['Astronomy', 'Herbology', 'Defense Against the Dark Arts', 'Divination', 'Muggle Studies', 'Ancient Runes', 'History of Magic', 'Transfiguration', 'Charms', 'Flying']
+		# labels = ['Astronomy', 'Herbology', 'Defense Against the Dark Arts', 'Divination', 'Muggle Studies', 'Ancient Runes', 'History of Magic', 'Transfiguration', 'Charms', 'Flying']
 		
 
 		# Replace NaN value by mean

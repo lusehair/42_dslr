@@ -78,7 +78,7 @@ class MyLogisticRegression():
 
 			if X_ is not None:
 				prod = np.matmul(X_, self.theta)
-				return np.array([round(1 / (1 + exp(-(xi)))) for xi in prod]).reshape(-1, 1)
+				return np.array([round(1 / (1 + exp(-(xi))), 3) for xi in prod]).reshape(-1, 1)
 			else:
 				print("e")
 				return None
